@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบสำหรับนิสิต · ระบบจองสถานที่ฝึกงาน{% endblock %}
+
+{% block content %}
+<div class="auth-split">
+  <aside class="auth-aside aside-student">
+    <span class="auth-badge">🎓 สำหรับนิสิต</span>
+    <h1>เข้าสู่ระบบนิสิต</h1>
+    <p>ใช้ <strong>รหัสนิสิต</strong> และรหัสผ่านที่คุณสมัครไว้</p>
+    <ul class="aside-list">
+      <li>ยื่นคำขอลงทะเบียนสถานที่ฝึกงานของตัวเอง</li>
+      <li>แนบ Resume และแก้ไขข้อมูลได้ตลอด</li>
+      <li>ติดตามสถานะ รออนุมัติ / อนุมัติ / ไม่อนุมัติ</li>
+    </ul>
+    <p class="aside-foot">หากยังไม่มีบัญชี เลือก «สมัครสมาชิก» ที่เมนูด้านบนได้เลย</p>
+  </aside>
+
+  <div class="card auth-card">
+    <h2 class="auth-title">เข้าสู่ระบบ</h2>
+    <p class="muted small">ช่องที่มีเครื่องหมาย <span class="req">*</span> ต้องกรอก</p>
+
+    <form method="post" class="form" autocomplete="on">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ next or '' }}">
+
+      <label for="username">รหัสนิสิต <span class="req">*</span></label>
+      <input id="username" type="text" name="username" required autofocus
+             inputmode="numeric" placeholder="เช่น 65012345">
+
+      <label for="password">รหัสผ่าน <span class="req">*</span></label>
+      <input id="password" type="password" name="password" required placeholder="รหัสผ่านของคุณ">
+
+      <button class="btn btn-primary block" type="submit">เข้าสู่ระบบ</button>
+    </form>
+
+    <p class="center muted small" style="margin-top:1rem">
+      ยังไม่มีบัญชี? <a href="{{ url_for('register') }}">สมัครสมาชิก</a>
+    </p>
+    <p class="center muted small">
+      เป็นเจ้าหน้าที่? <a href="{{ url_for('admin_login') }}">เข้าสู่ระบบสำหรับเจ้าหน้าที่ →</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

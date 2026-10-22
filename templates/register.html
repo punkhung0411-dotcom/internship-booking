@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}สมัครสมาชิก · ระบบจองสถานที่ฝึกงาน{% endblock %}
+
+{% block content %}
+<div class="card narrow">
+  <h1>สมัครสมาชิก (นิสิต)</h1>
+  <p class="muted">ใช้เพียง 4 อย่าง: ชื่อ · นามสกุล · รหัสนิสิต · เบอร์โทรศัพท์ (และตั้งรหัสผ่านสำหรับเข้าสู่ระบบ)</p>
+
+  <form method="post" class="form">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+
+    <div class="grid-2">
+      <div>
+        <label>ชื่อ <span class="req">*</span></label>
+        <input type="text" name="first_name" required value="{{ form.get('first_name', '') }}" placeholder="เช่น สมชาย">
+      </div>
+      <div>
+        <label>นามสกุล <span class="req">*</span></label>
+        <input type="text" name="last_name" required value="{{ form.get('last_name', '') }}" placeholder="เช่น ใจดี">
+      </div>
+      <div>
+        <label>รหัสนิสิต <span class="req">*</span></label>
+        <input type="text" name="student_id" required value="{{ form.get('student_id', '') }}" placeholder="เช่น 65012345">
+      </div>
+      <div>
+        <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input type="text" name="phone" required value="{{ form.get('phone', '') }}" placeholder="เช่น 0812345678">
+      </div>
+      <div>
+        <label>รหัสผ่าน (อย่างน้อย 8 ตัวอักษร) <span class="req">*</span></label>
+        <input type="password" name="password" required>
+      </div>
+      <div>
+        <label>ยืนยันรหัสผ่าน <span class="req">*</span></label>
+        <input type="password" name="confirm_password" required>
+      </div>
+    </div>
+
+    <button class="btn primary" type="submit">สมัครสมาชิก</button>
+    <a class="btn" href="{{ url_for('login') }}">กลับไปหน้าเข้าสู่ระบบ</a>
+  </form>
+</div>
+{% endblock %}

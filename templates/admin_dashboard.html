@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}หน้าหลักเจ้าหน้าที่{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>หน้าหลักเจ้าหน้าที่</h1>
+    <p class="muted">ภาพรวมการลงทะเบียนสถานที่ฝึกงานทั้งหมด</p>
+  </div>
+  <a class="btn primary" href="{{ url_for('admin_bookings', status='pending') }}">ตรวจคำขอที่รออนุมัติ</a>
+</div>
+
+<div class="stats">
+  <div class="stat warn"><span class="num">{{ stats.pending or 0 }}</span><span>รออนุมัติ</span></div>
+  <div class="stat ok"><span class="num">{{ stats.approved or 0 }}</span><span>อนุมัติแล้ว</span></div>
+  <div class="stat bad"><span class="num">{{ stats.rejected or 0 }}</span><span>ไม่อนุมัติ</span></div>
+  <div class="stat gray"><span class="num">{{ stats.cancelled or 0 }}</span><span>ยกเลิกแล้ว</span></div>
+  <div class="stat"><span class="num">{{ stats.total or 0 }}</span><span>คำขอทั้งหมด</span></div>
+  <div class="stat"><span class="num">{{ students }}</span><span>นิสิตในระบบ</span></div>
+  <div class="stat"><span class="num">{{ place_count }}</span><span>สถานที่ฝึกงาน</span></div>
+  <div class="stat"><span class="num">{{ attachment_count }}</span><span>ไฟล์ Resume/เอกสาร</span></div>
+</div>
+
+<div class="grid-2 gap">
+  <div class="card">
+    <h2>คำขอที่รออนุมัติ</h2>
+    {% if pending %}
+      <table class="table">
+        <thead><tr><th>เลขที่</th><th>นิสิต</th><th>ประเภท / สถานที่</th><th></th></tr></thead>
+        <tbody>
+        {% for b in pending %}
+          <tr>
+            <td>{{ b.booking_code }}<div class="muted small">{{ b.created_at|datetime_th }}</div></td>
+            <td>{{ b.student_first }} {{ b.student_last }}<div class="muted small">{{ b.student_code }}</div></td>
+            <td><span class="badge gray">{{ b.type_name }}</span><div>{{ b.venue_name }}</div></td>
+            <td><a class="btn small primary" href="{{ url_for('admin_booking_detail', booking_id=b.id) }}">พิจารณา</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p><a class="btn small" href="{{ url_for('admin_bookings', status='pending') }}">ดูทั้งหมด</a></p>
+    {% else %}
+      <p class="empty">ไม่มีคำขอค้างพิจารณา 🎉</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>จำนวนคำขอแยกตามประเภทสถานที่</h2>
+    <ul class="barlist">
+      {% for t in type_counts %}
+        <li>
+          <span class="barlabel">{{ t.type_name }}</span>
+          <span class="bar" style="width: {{ (t.c * 15) if (t.c * 15) < 100 else 100 }}%"></span>
+          <span class="barnum">{{ t.c }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h2>สถานที่ฝึกงานที่มีคำขอมากที่สุด</h2>
+    {% if by_venue and by_venue[0].c > 0 %}
+      <ul class="barlist">
+        {% for v in by_venue %}
+          {% if v.c > 0 %}
+          <li>
+            <span class="barlabel" title="{{ v.venue_name }}">{{ v.venue_name }} ({{ v.type_name }})</span>
+            <span class="bar" style="width: {{ (v.c * 15) if (v.c * 15) < 100 else 100 }}%"></span>
+            <span class="barnum">{{ v.c }}</span>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">ยังไม่มีข้อมูล</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

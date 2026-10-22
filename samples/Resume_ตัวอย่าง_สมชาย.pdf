@@ -1,0 +1,30 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R
+   /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 300 >>
+stream
+BT /F1 18 Tf 60 780 Td (RESUME) Tj ET
+BT /F1 13 Tf 60 750 Td (Name: Somchai Jaidee) Tj ET
+BT /F1 12 Tf 60 725 Td (Student ID: 65012345) Tj ET
+BT /F1 12 Tf 60 700 Td (Faculty of Science, Computer Science) Tj ET
+BT /F1 12 Tf 60 675 Td (Email: somchai@example.com) Tj ET
+BT /F1 12 Tf 60 650 Td (Phone: 081-234-5678) Tj ET
+BT /F1 12 Tf 60 610 Td (Skills: Python, SQL, Web Development) Tj ET
+BT /F1 12 Tf 60 585 Td (This file is a sample resume for testing the booking system.) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+trailer
+<< /Root 1 0 R /Size 6 >>
+%%EOF

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบสำหรับเจ้าหน้าที่ · ระบบจองสถานที่ฝึกงาน{% endblock %}
+
+{% block content %}
+<div class="auth-split">
+  <aside class="auth-aside aside-admin">
+    <span class="auth-badge">🔐 สำหรับเจ้าหน้าที่</span>
+    <h1>เข้าสู่ระบบเจ้าหน้าที่</h1>
+    <p>สำหรับผู้ดูแลระบบ (admin) และ <strong>ผู้ดูแล</strong>ที่ได้รับแต่งตั้งจากเจ้าหน้าที่</p>
+    <ul class="aside-list">
+      <li>อนุมัติ / ไม่อนุมัติคำขอ พร้อมหมายเหตุ</li>
+      <li>ดาวน์โหลด Resume และดูข้อมูลนิสิต</li>
+      <li>จัดการชื่อสถานที่และประเภทสถานที่ <span class="muted small">(เฉพาะผู้ดูแลระบบ)</span></li>
+    </ul>
+    <p class="aside-foot">บัญชีเริ่มต้นชื่อผู้ใช้ <code>admin</code> — ควรเปลี่ยนรหัสผ่านทันทีหลังเข้าใช้ครั้งแรก<br>
+      นิสิตที่ได้รับแต่งตั้งเป็นผู้ดูแล ใช้ <strong>รหัสนิสิต + รหัสผ่านเดิม</strong> ล็อกอินหน้านี้ได้เลย</p>
+  </aside>
+
+  <div class="card auth-card">
+    <h2 class="auth-title">เข้าสู่ระบบเจ้าหน้าที่</h2>
+    <p class="muted small">ช่องที่มีเครื่องหมาย <span class="req">*</span> ต้องกรอก</p>
+
+    <form method="post" class="form" autocomplete="on">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ next or '' }}">
+
+      <label for="admin_username">ชื่อผู้ใช้เจ้าหน้าที่ <span class="req">*</span></label>
+      <input id="admin_username" type="text" name="username" required autofocus
+             placeholder="admin" autocomplete="username">
+
+      <label for="admin_password">รหัสผ่าน <span class="req">*</span></label>
+      <input id="admin_password" type="password" name="password" required
+             placeholder="รหัสผ่านของเจ้าหน้าที่" autocomplete="current-password">
+
+      <button class="btn btn-primary block" type="submit">เข้าสู่ระบบเจ้าหน้าที่</button>
+    </form>
+
+    <p class="center muted small" style="margin-top:1rem">
+      เป็นนิสิต? <a href="{{ url_for('login') }}">ไปที่หน้าสำหรับนิสิต →</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

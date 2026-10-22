@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}หน้าหลักนิสิต{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>สวัสดีครับ/ค่ะ {{ current_user.first_name }} {{ current_user.last_name }}</h1>
+    <p class="muted">รหัสนิสิต {{ current_user.student_id }}{% if current_user.phone %} · โทร. {{ current_user.phone }}{% endif %}</p>
+  </div>
+  <a class="btn primary" href="{{ url_for('create_booking') }}">+ ยื่นคำขอลงทะเบียนสถานที่ฝึกงาน</a>
+</div>
+
+{% if current_user.can_review %}
+<div class="staff-banner">
+  <span class="staff-banner-icon">🛡️</span>
+  <div>
+    <strong>คุณได้รับแต่งตั้งเป็น “ผู้ดูแล”</strong>
+    <p>ช่วยตรวจสอบและอนุมัติคำขอของนิสิตได้ที่โหมดผู้ดูแล</p>
+  </div>
+  <a class="btn small staff" href="{{ url_for('admin_dashboard') }}">เข้าโหมดผู้ดูแล →</a>
+</div>
+{% endif %}
+
+<div class="stats">
+  <div class="stat"><span class="num">{{ stats.total or 0 }}</span><span>คำขอทั้งหมด</span></div>
+  <div class="stat warn"><span class="num">{{ stats.pending or 0 }}</span><span>รออนุมัติ</span></div>
+  <div class="stat ok"><span class="num">{{ stats.approved or 0 }}</span><span>อนุมัติแล้ว</span></div>
+  <div class="stat bad"><span class="num">{{ stats.rejected or 0 }}</span><span>ไม่อนุมัติ</span></div>
+  <div class="stat gray"><span class="num">{{ stats.cancelled or 0 }}</span><span>ยกเลิกแล้ว</span></div>
+  <div class="stat"><span class="num">{{ counts.places or 0 }}</span><span>สถานที่ที่ลงทะเบียน</span></div>
+</div>
+
+<div class="grid-2 gap">
+  <div class="card">
+    <h2>คำขอล่าสุดของฉัน</h2>
+    {% if recent %}
+      <table class="table">
+        <thead>
+          <tr><th>เลขที่</th><th>ประเภท</th><th>สถานที่</th><th>สถานะ</th></tr>
+        </thead>
+        <tbody>
+        {% for b in recent %}
+          <tr>
+            <td><a href="{{ url_for('booking_detail', booking_id=b.id) }}">{{ b.booking_code }}</a></td>
+            <td><span class="badge gray">{{ b.type_name }}</span></td>
+            <td>{{ b.venue_name }}</td>
+            <td><span class="badge {{ STATUS_COLORS[b.status] }}">{{ STATUS_LABELS[b.status] }}</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p><a class="btn small" href="{{ url_for('my_bookings') }}">ดูคำขอทั้งหมด</a></p>
+    {% else %}
+      <p class="empty">ยังไม่มีคำขอ — เริ่มต้นด้วยการยื่นคำขอลงทะเบียนสถานที่ฝึกงาน</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>วิธีใช้งาน 3 ขั้นตอน</h2>
+    <ol class="feature-list">
+      <li><strong>ยื่นคำขอ</strong> — เลือกประเภทสถานที่ (ฟิตเนส / อคาเดมี่ / โรงเรียน / สถานที่ราชการ)
+          หรือ <strong>เพิ่มประเภทใหม่เอง</strong> แล้วเลือกชื่อเดิมหรือพิมพ์ชื่อสถานที่ฝึกงานของตัวเอง</li>
+      <li><strong>แนบ Resume</strong> — ไฟล์ PDF หรือ Word ขนาดไม่เกิน {{ MAX_FILE_MB }} MB</li>
+      <li><strong>รอเจ้าหน้าที่อนุมัติ</strong> — ดูสถานะได้ที่เมนู «คำขอของฉัน»</li>
+    </ol>
+    <table class="kv">
+      <tr><th>ไฟล์ Resume ที่เคยส่ง</th><td>{{ counts.resume_files or 0 }} ไฟล์</td></tr>
+      <tr><th>ประเภทสถานที่ที่เคยลงทะเบียน</th><td>{{ counts.types or 0 }} ประเภท</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

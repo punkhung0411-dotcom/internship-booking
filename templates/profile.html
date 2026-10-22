@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}โปรไฟล์ของฉัน{% endblock %}
+
+{% block content %}
+<h1>โปรไฟล์ของฉัน
+  {% if current_user.role == 'admin' %}
+    <span class="badge staff">🔐 ผู้ดูแลระบบ</span>
+  {% elif current_user.can_review %}
+    <span class="badge staff">🛡️ ผู้ดูแล</span>
+  {% endif %}
+</h1>
+
+<div class="grid-2 gap">
+  <div class="card">
+    <h2>ข้อมูลส่วนตัว</h2>
+    <form method="post" class="form">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="info">
+
+      <label>รหัสนิสิต / ชื่อผู้ใช้ (แก้ไขไม่ได้)</label>
+      <input type="text" value="{{ current_user.student_id }}" disabled>
+
+      <label>ชื่อ</label>
+      <input type="text" name="first_name" value="{{ current_user.first_name }}" required>
+
+      <label>นามสกุล</label>
+      <input type="text" name="last_name" value="{{ current_user.last_name }}" required>
+
+      <label>เบอร์โทรศัพท์</label>
+      <input type="text" name="phone" value="{{ current_user.phone or '' }}" required>
+
+      <button class="btn primary" type="submit">บันทึกข้อมูล</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>เปลี่ยนรหัสผ่าน</h2>
+    <form method="post" class="form">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="password">
+
+      <label>รหัสผ่านเดิม</label>
+      <input type="password" name="old_password" required>
+
+      <label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)</label>
+      <input type="password" name="new_password" required>
+
+      <label>ยืนยันรหัสผ่านใหม่</label>
+      <input type="password" name="confirm_password" required>
+
+      <button class="btn primary" type="submit">เปลี่ยนรหัสผ่าน</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

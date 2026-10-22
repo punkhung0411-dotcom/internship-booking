@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}คำขอทั้งหมด{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>คำขอทั้งหมด</h1>
+  <span class="muted">พบ {{ total }} รายการ</span>
+</div>
+
+<div class="card">
+  <form method="get" class="filters">
+    <div>
+      <label>สถานะ</label>
+      <select name="status">
+        <option value="">ทั้งหมด</option>
+        {% for key, label in STATUS_LABELS.items() %}
+          <option value="{{ key }}" {{ 'selected' if status == key }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>ประเภทสถานที่</label>
+      <select name="type_id">
+        <option value="">ทั้งหมด</option>
+        {% for t in all_venue_types %}
+          <option value="{{ t.id }}" {{ 'selected' if type_id == t.id }}>{{ t.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>ชื่อสถานที่</label>
+      <select name="venue_id">
+        <option value="">ทั้งหมด</option>
+        {% for v in all_venues %}
+          <option value="{{ v.id }}" {{ 'selected' if venue_id == v.id }}>{{ v.name }} ({{ v.type_name }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>ค้นหา (ชื่อ/รหัสนิสิต/เบอร์โทร/สถานที่/เลขที่)</label>
+      <input type="text" name="q" value="{{ keyword }}" placeholder="พิมพ์คำค้น">
+    </div>
+    <div class="filter-actions">
+      <button class="btn primary" type="submit">ค้นหา</button>
+      <a class="btn" href="{{ url_for('admin_bookings') }}">ล้างตัวกรอง</a>
+    </div>
+  </form>
+</div>
+
+{% if bookings %}
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>เลขที่</th><th>นิสิต</th><th>ประเภท</th><th>สถานที่ฝึกงาน</th>
+        <th>Resume</th><th>สถานะ</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in bookings %}
+      <tr>
+        <td>{{ b.booking_code }}<div class="muted small">{{ b.created_at|datetime_th }}</div></td>
+        <td>{{ b.student_first }} {{ b.student_last }}
+            <div class="muted small">{{ b.student_code }} · {{ b.student_phone or '-' }}</div></td>
+        <td><span class="badge gray">{{ b.type_name }}</span></td>
+        <td>{{ b.venue_name }}</td>
+        <td>
+          {% if b.id in resume_map %}<span class="badge ok">มี</span>{% else %}<span class="badge gray">ไม่มี</span>{% endif %}
+        </td>
+        <td><span class="badge {{ STATUS_COLORS[b.status] }}">{{ STATUS_LABELS[b.status] }}</span></td>
+        <td><a class="btn small primary" href="{{ url_for('admin_booking_detail', booking_id=b.id) }}">เปิดดู</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if total_pages > 1 %}
+  <div class="pager">
+    {% for p in range(1, total_pages + 1) %}
+      <a class="page {{ 'active' if p == page }}"
+         href="{{ url_for('admin_bookings', status=status, type_id=type_id, venue_id=venue_id, q=keyword, page=p) }}">{{ p }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% else %}
+<div class="card"><p class="empty">ไม่พบรายการที่ตรงกับเงื่อนไข</p></div>
+{% endif %}
+{% endblock %}

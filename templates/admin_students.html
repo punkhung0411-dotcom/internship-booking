@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}รายชื่อนิสิต{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>รายชื่อนิสิตในระบบ</h1>
+  <span class="muted">ทั้งหมด {{ students|length }} คน</span>
+</div>
+
+<div class="card">
+  <h2>แต่งตั้งผู้ดูแล (ช่วยอนุมัติ/ตรวจสอบคำขอ)</h2>
+  <p class="muted small" style="margin:.2rem 0 0">
+    กด <strong>«แต่งตั้งเป็นผู้ดูแล»</strong> ที่รายชื่อนิสิตที่ต้องการ — นิสิตคนนั้นจะเห็นเมนู
+    <strong>🛡️ โหมดผู้ดูแล</strong> และเข้าไปดูคำขอ ตรวจ Resume อนุมัติ/ไม่อนุมัติได้ทันที
+    (แต่ยัง <em>จัดการบัญชี/สถานที่</em> ไม่ได้ — เป็นสิทธิ์ของผู้ดูแลระบบเท่านั้น)
+    ถอดถอนได้ตลอดเวลาด้วยปุ่มเดิม
+  </p>
+</div>
+
+<div class="card">
+  <form method="get" class="filters">
+    <div>
+      <label>ค้นหา (ชื่อ / รหัสนิสิต / เบอร์โทร)</label>
+      <input type="text" name="q" value="{{ keyword }}" placeholder="พิมพ์คำค้น">
+    </div>
+    <div class="filter-actions">
+      <button class="btn primary" type="submit">ค้นหา</button>
+      <a class="btn" href="{{ url_for('admin_students') }}">ล้าง</a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr><th>รหัสนิสิต</th><th>ชื่อ - นามสกุล</th><th>เบอร์โทร</th><th>สิทธิ์</th>
+          <th>คำขอ (อนุมัติ)</th><th>สถานะ</th><th>จัดการ</th></tr>
+    </thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td class="nowrap">{{ s.student_id }}</td>
+        <td class="nowrap">{{ s.first_name }} {{ s.last_name }}</td>
+        <td class="nowrap">{{ s.phone or '-' }}</td>
+        <td class="nowrap">
+          {% if s.can_review %}<span class="badge staff">🛡️ ผู้ดูแล</span>
+          {% else %}<span class="badge gray">นิสิต</span>{% endif %}
+        </td>
+        <td class="nowrap">{{ s.booking_count }} ({{ s.approved_count }})</td>
+        <td class="nowrap">
+          {% if s.is_active %}<span class="badge ok">ใช้งานได้</span>
+          {% else %}<span class="badge gray">ถูกระงับ</span>{% endif %}
+        </td>
+        <td>
+          <div class="row-actions">
+            <form method="post" action="{{ url_for('admin_appoint_student', user_id=s.id) }}">
+              <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+              <button class="btn small {{ 'ghost' if s.can_review else 'staff' }}" type="submit">
+                {{ 'ถอดจากผู้ดูแล' if s.can_review else 'แต่งตั้งเป็นผู้ดูแล' }}
+              </button>
+            </form>
+            <form method="post" action="{{ url_for('admin_toggle_student', user_id=s.id) }}">
+              <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+              <button class="btn small" type="submit">{{ 'ระงับบัญชี' if s.is_active else 'เปิดใช้งาน' }}</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if not students %}<p class="empty">ไม่พบรายชื่อนิสิต</p>{% endif %}
+</div>
+{% endblock %}

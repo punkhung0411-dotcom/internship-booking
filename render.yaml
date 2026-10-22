@@ -1,0 +1,42 @@
+# render.yaml — Deploy ระบบจองสถานที่ฝึกงานบน Render
+# วิธีใช้: Push โค้ดขึ้น GitHub -> ที่ Render คลิก "New +" -> "Blueprint" -> เลือก repo นี้
+# หรือ: ไปที่ Dashboard -> New -> Web Service -> เชื่อม GitHub -> Render จะอ่านไฟล์นี้อัตโนมัติ
+
+services:
+  - type: web
+    name: internship-booking
+    runtime: python
+    region: singapore          # ใกล้ไทยที่สุด (เร็วที่สุด)
+    plan: free                 # ฟรี 750 ชม./เดือน (พอใช้งานจริงได้)
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: python -m waitress --host=0.0.0.0 --port=$PORT --threads=8 app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: BOOKING_DB_PATH
+        value: /var/data/booking.db
+      - key: BOOKING_UPLOAD_DIR
+        value: /var/data/uploads
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      # ตัวเลือก: ถ้าอยากให้เข้าถึงได้เฉพาะ IP บางช่วง ใส่ค่า ALLOWED_IPS (คั่นด้วยจุลภาค)
+      # - key: ALLOWED_IPS
+      #   value: "203.0.113.0/24,198.51.100.5"
+    healthCheckPath: /
+    autoDeploy: true           # Deploy ใหม่ทุกครั้งที่ push ขึ้น main
+    disk:
+      name: data-disk
+      mountPath: /var/data
+      sizeGB: 1                # 1 GB ฟรี (พอ SQLite + Resume หลายร้อยไฟล์)
+
+# หมายเหตุ:
+# - Render จะสร้าง Disk ให้อัตโนมัติครั้งแรก (ข้อมูลคงอยู่แม้ deploy ใหม่)
+# - SECRET_KEY จะสุ่มให้เองทุกครั้งที่สร้าง service ใหม่ (ปลอดภัย)
+# - ฟรี plan จะ "นอน" หลังไม่มี request 15 นาที -> request แรกจะช้า ~10-20 วิ (cold start)
+#   ถ้าไม่ต้องการให้นอน ให้อัปเกรดเป็น Starter ($7/เดือน) หรือ ping ทุก 10 นาทีด้วย cron-job.org

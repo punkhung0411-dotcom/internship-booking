@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}สถานที่ฝึกงาน{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>สถานที่ฝึกงาน</h1>
+  <span class="muted">แยกตามประเภท · เพิ่มชื่อสถานที่ได้เอง</span>
+</div>
+
+<div class="grid-2 gap">
+  <div class="card">
+    <h2>เพิ่มชื่อสถานที่ฝึกงาน</h2>
+    <form method="post" action="{{ url_for('admin_add_venue') }}" class="form">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="grid-2">
+        <div>
+          <label>ประเภทสถานที่</label>
+          <select name="type_id" required>
+            <option value="">-- เลือกประเภท --</option>
+            {% for t in types %}
+              <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>ชื่อสถานที่</label>
+          <input type="text" name="name" required maxlength="120" placeholder="เช่น ฟิตเนส บ้านสวน">
+        </div>
+      </div>
+      <button class="btn primary" type="submit">เพิ่มสถานที่</button>
+    </form>
+
+    <h2>เพิ่มประเภทสถานที่ใหม่</h2>
+    <form method="post" action="{{ url_for('admin_add_venue_type') }}" class="form">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <label>ชื่อประเภท</label>
+      <input type="text" name="name" required maxlength="60" placeholder="เช่น โรงพยาบาล, บริษัทเอกชน">
+      <button class="btn" type="submit">เพิ่มประเภท</button>
+    </form>
+    <p class="muted small">
+      นิสิตเพิ่ม <strong>ชื่อสถานที่</strong> และ <strong>ประเภทใหม่</strong> ได้เองจากหน้าฟอร์มยื่นคำขอ
+      ระบบจะบันทึกเข้าประเภทที่เลือกให้อัตโนมัติ (ชื่อซ้ำจะใช้ของเดิม ไม่สร้างซ้ำ)
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>ประเภทที่มีอยู่ <span class="muted small">({{ types|length }} ประเภท)</span></h2>
+    <table class="table">
+      <thead>
+        <tr><th>ประเภท</th><th>เพิ่มโดย</th><th>สถานะ</th></tr>
+      </thead>
+      <tbody>
+      {% for t in types %}
+        <tr>
+          <td>{{ t.name }}</td>
+          <td>
+            {% if t.created_by %}
+              {{ t.creator_first }} {{ t.creator_last }}
+              <span class="muted small">({{ 'เจ้าหน้าที่' if t.creator_role == 'admin' else 'นิสิต' }})</span>
+            {% else %}
+              <span class="muted small">ข้อมูลเริ่มต้น</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if t.is_active %}<span class="badge ok">ใช้งาน</span>
+            {% else %}<span class="badge gray">ปิดใช้งาน</span>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for type_name, items in grouped.items() %}
+<div class="card">
+  <h2>{{ type_name }} <span class="muted small">({{ items|length }} สถานที่)</span></h2>
+  <table class="table">
+    <thead><tr><th>ชื่อสถานที่</th><th>จำนวนคำขอ</th><th>เพิ่มโดย</th><th>สถานะ</th><th></th></tr></thead>
+    <tbody>
+    {% for v in items %}
+      <tr>
+        <td>{{ v.name }}</td>
+        <td>{{ v.booking_count }}</td>
+        <td>
+          {% if v.created_by %}
+            {{ v.creator_first }} {{ v.creator_last }} <span class="muted small">(นิสิต)</span>
+          {% else %}
+            <span class="muted small">เจ้าหน้าที่ / ข้อมูลเริ่มต้น</span>
+          {% endif %}
+        </td>
+        <td>{% if v.is_active %}<span class="badge ok">ใช้งาน</span>{% else %}<span class="badge gray">ซ่อน</span>{% endif %}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_toggle_venue', venue_id=v.id) }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <button class="btn small" type="submit">{{ 'ซ่อน' if v.is_active else 'เปิดใช้' }}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

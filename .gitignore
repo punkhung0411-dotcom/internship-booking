@@ -1,0 +1,44 @@
+# .gitignore — ไฟล์ที่ไม่ควร push ขึ้น Git
+# ===================================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Environment / Secrets
+.env
+*.key
+secret_key.txt
+
+# Database & Uploads (ข้อมูลจริง — ไม่ push ขึ้น Git)
+data/booking.db
+data/booking.db.backup-*
+uploads/
+*.db
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Build / Dist
+dist/
+build/
+*.egg
+
+# Render / Deploy
+render.yaml.bak

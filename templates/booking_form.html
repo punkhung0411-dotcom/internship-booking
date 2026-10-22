@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}ยื่นคำขอลงทะเบียนสถานที่ฝึกงาน{% endblock %}
+
+{% block content %}
+<div class="card narrow">
+  <h1>ยื่นคำขอลงทะเบียนสถานที่ฝึกงาน</h1>
+  <p class="muted">ช่องที่มีเครื่องหมาย <span class="req">*</span> ต้องกรอก · ไม่ต้องระบุวันที่หรือเวลา</p>
+
+  <ol class="steps" aria-label="ขั้นตอนการยื่นคำขอ">
+    <li class="current"><span>1</span> สถานที่ฝึกงาน</li>
+    <li><span>2</span> ข้อมูลนิสิต</li>
+    <li><span>3</span> ไฟล์ Resume</li>
+  </ol>
+
+  <form method="post" enctype="multipart/form-data" class="form">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+
+    <h2>1) สถานที่ฝึกงาน</h2>
+
+    <label>ประเภทสถานที่ฝึกงาน <span class="req">*</span></label>
+    <p class="muted small" style="margin:.1rem 0 .4rem">
+      ถ้าไม่พบประเภทที่ต้องการ เลือก <strong>«➕ เพิ่มประเภทใหม่»</strong> แล้วพิมพ์ชื่อประเภทเองได้เลย
+    </p>
+    <select name="type_id" id="type_id" required>
+      <option value="">-- เลือกประเภท --</option>
+      {% for t in all_venue_types %}
+        <option value="{{ t.id }}" {{ 'selected' if form.get('type_id')|string == t.id|string }}>{{ t.name }}</option>
+      {% endfor %}
+      <option value="__new__" {{ 'selected' if form.get('type_id') == '__new__' }}>➕ เพิ่มประเภทใหม่ (พิมพ์เอง)</option>
+    </select>
+
+    <div id="new_type_wrap" class="new-type-box {{ '' if form.get('type_id') == '__new__' else 'hidden' }}">
+      <label for="new_type_name">ชื่อประเภทใหม่ <span class="req">*</span></label>
+      <input type="text" name="new_type_name" id="new_type_name" maxlength="60"
+             value="{{ form.get('new_type_name', '') }}"
+             placeholder="เช่น โรงพยาบาล, บริษัทเอกชน, มูลนิธิ">
+      <p class="muted small" style="margin:.35rem 0 0">
+        ระบบจะเพิ่มประเภทนี้ให้ทุกคนใช้ร่วมกัน และเปิดใช้งานทันที
+      </p>
+    </div>
+
+    <label>ชื่อสถานที่ฝึกงาน <span class="req">*</span></label>
+    <p class="muted small" style="margin:.1rem 0 .4rem">
+      เลือกจากรายการที่เคยมีคนใช้แล้ว ด้านล่าง หรือจะพิมพ์ชื่อใหม่ของตัวเองในช่องที่สองก็ได้
+    </p>
+    <select name="venue_id" id="venue_id">
+      <option value="">-- เลือกจากรายการเดิม --</option>
+      {% for v in all_venues %}
+        <option value="{{ v.id }}" data-type="{{ v.type_id }}"
+          {{ 'selected' if form.get('venue_id')|string == v.id|string }}>
+          {{ v.name }} ({{ v.type_name }})
+        </option>
+      {% endfor %}
+    </select>
+    <input type="text" name="new_venue_name" id="new_venue_name" maxlength="120"
+           value="{{ form.get('new_venue_name', '') }}"
+           placeholder="หรือพิมพ์ชื่อสถานที่ฝึกงานใหม่ของฉัน เช่น ฟิตเนส บ้านสวน">
+
+    <hr class="sep">
+
+    <h2>2) ข้อมูลนิสิต</h2>
+    <div class="grid-2">
+      <div>
+        <label>ชื่อ <span class="req">*</span></label>
+        <input type="text" name="first_name" required value="{{ form.get('first_name', '') }}" placeholder="เช่น สมชาย">
+      </div>
+      <div>
+        <label>นามสกุล <span class="req">*</span></label>
+        <input type="text" name="last_name" required value="{{ form.get('last_name', '') }}" placeholder="เช่น ใจดี">
+      </div>
+      <div>
+        <label>รหัสนิสิต</label>
+        <input type="text" value="{{ current_user.student_id }}" disabled>
+      </div>
+      <div>
+        <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input type="text" name="phone" required value="{{ form.get('phone', '') }}" placeholder="เช่น 0812345678">
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <h2>3) ไฟล์ Resume</h2>
+    <p class="muted small">รองรับ PDF, DOC, DOCX · ไฟล์ละไม่เกิน {{ MAX_FILE_MB }} MB</p>
+
+    <label>ไฟล์ Resume (จำเป็น) <span class="req">*</span></label>
+    <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+
+    <label>เอกสารประกอบเพิ่มเติม (ไม่บังคับ ไม่เกิน 2 ไฟล์)</label>
+    <input type="file" name="documents" accept=".pdf,.doc,.docx" multiple>
+
+    <div class="actions">
+      <button class="btn primary" type="submit">ส่งคำขอ</button>
+      <a class="btn" href="{{ url_for('dashboard') }}">ยกเลิก</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% endblock %}

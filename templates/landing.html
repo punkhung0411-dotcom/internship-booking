@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}ระบบจองสถานที่ฝึกงาน · เลือกทางเข้า{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="pill">ระบบสำหรับสถานศึกษา</span>
+    <h1>ลงทะเบียนสถานที่ฝึกงาน<br><span class="grad">ง่ายในไม่กี่คลิก</span></h1>
+    <p class="hero-sub">
+      นิสิตยื่นคำขอพร้อมแนบ Resume · เจ้าหน้าที่ตรวจสอบและอนุมัติ ·
+      ข้อมูลทั้งหมดเก็บไว้ในเครื่อง เปิดดูได้ทุกเมื่อ
+    </p>
+    <div class="hero-points">
+      <span>✓ แยกประเภทสถานที่</span>
+      <span>✓ พิมพ์ชื่อสถานที่เองได้</span>
+      <span>✓ ไม่ต้องระบุวันที่/เวลา</span>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title">เลือกทางเข้าใช้งาน</h2>
+
+<div class="entry-grid">
+  <a class="entry-card entry-student" href="{{ url_for('login') }}">
+    <span class="entry-icon">🎓</span>
+    <h3>สำหรับนิสิต</h3>
+    <p class="entry-desc">ยื่นคำขอลงทะเบียนสถานที่ฝึกงาน แนบ Resume และติดตามผลการอนุมัติ</p>
+    <ul class="entry-list">
+      <li>เลือกประเภทสถานที่ (ฟิตเนส / อคาเดมี่ / โรงเรียน / ราชการ)</li>
+      <li>พิมพ์ชื่อสถานที่ฝึกงานของตัวเองได้</li>
+      <li>แนบ Resume PDF หรือ Word ไม่เกิน 15 MB</li>
+    </ul>
+    <span class="entry-cta">เข้าสู่ระบบนิสิต <span aria-hidden="true">→</span></span>
+  </a>
+
+  <a class="entry-card entry-admin" href="{{ url_for('admin_login') }}">
+    <span class="entry-icon">🔐</span>
+    <h3>สำหรับเจ้าหน้าที่</h3>
+    <p class="entry-desc">ตรวจสอบคำขอ อนุมัติ/ไม่อนุมัติ และจัดการข้อมูลสถานที่ฝึกงาน</p>
+    <ul class="entry-list">
+      <li>ภาพรวมและสถิติแยกตามประเภทสถานที่</li>
+      <li>ดาวน์โหลด Resume ของนิสิตได้ในคลิกเดียว</li>
+      <li>เพิ่มชื่อสถานที่ / เพิ่มประเภทใหม่เองได้</li>
+    </ul>
+    <span class="entry-cta">เข้าสู่ระบบเจ้าหน้าที่ <span aria-hidden="true">→</span></span>
+  </a>
+</div>
+
+<p class="center muted small">
+  ยังไม่มีบัญชีสำหรับนิสิต? <a href="{{ url_for('register') }}">สมัครสมาชิกฟรี</a> ·
+  ระบบนี้ทำงานในเครื่อง/วง WiFi ภายในสถานศึกษา
+</p>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}เกิดข้อผิดพลาด {{ code }}{% endblock %}
+
+{% block content %}
+<div class="card narrow center error-card">
+  <span class="error-code">{{ code }}</span>
+  <h1>{{ message }}</h1>
+  <p class="muted">{{ detail }}</p>
+
+  <div class="actions center-actions">
+    {% if is_admin %}
+      <a class="btn btn-primary" href="{{ url_for('admin_dashboard') }}">กลับหน้าหลักเจ้าหน้าที่</a>
+      <a class="btn" href="{{ url_for('admin_bookings') }}">ไปที่คำขอทั้งหมด</a>
+    {% elif is_reviewer %}
+      <a class="btn btn-primary" href="{{ url_for('admin_dashboard') }}">กลับหน้าโหมดผู้ดูแล</a>
+      <a class="btn" href="{{ url_for('dashboard') }}">กลับหน้าหลักนิสิต</a>
+    {% elif current_user %}
+      <a class="btn btn-primary" href="{{ url_for('dashboard') }}">กลับหน้าหลักของฉัน</a>
+      <a class="btn" href="{{ url_for('my_bookings') }}">ไปที่คำขอของฉัน</a>
+    {% else %}
+      <a class="btn btn-primary" href="{{ url_for('index') }}">กลับหน้าแรก</a>
+      <a class="btn" href="{{ url_for('login') }}">เข้าสู่ระบบนิสิต</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

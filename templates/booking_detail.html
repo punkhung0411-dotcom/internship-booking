@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}คำขอ {{ booking.booking_code }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>คำขอ {{ booking.booking_code }}</h1>
+    <p class="muted">ยื่นคำขอเมื่อ {{ booking.created_at|datetime_th }}</p>
+  </div>
+  <div class="actions" style="margin-top:0">
+    <button class="btn" type="button" onclick="window.print()">🖨 พิมพ์หน้านี้</button>
+    <span class="badge big {{ STATUS_COLORS[booking.status] }}">{{ STATUS_LABELS[booking.status] }}</span>
+  </div>
+</div>
+
+<div class="grid-2 gap">
+  <div class="card">
+    <h2>ข้อมูลสถานที่ฝึกงาน</h2>
+    <table class="kv">
+      <tr><th>ประเภท</th><td><span class="badge gray">{{ booking.type_name }}</span></td></tr>
+      <tr><th>ชื่อสถานที่ฝึกงาน</th><td>{{ booking.venue_name }}</td></tr>
+    </table>
+
+    <h2>ข้อมูลนิสิต</h2>
+    <table class="kv">
+      <tr><th>ชื่อ - นามสกุล</th><td>{{ booking.student_first }} {{ booking.student_last }}</td></tr>
+      <tr><th>รหัสนิสิต</th><td>{{ booking.student_code }}</td></tr>
+      <tr><th>เบอร์โทรศัพท์</th><td>{{ booking.student_phone or '-' }}</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>ไฟล์ Resume / เอกสารแนบ</h2>
+    {% if attachments %}
+      <ul class="filelist">
+      {% for a in attachments %}
+        {% set ext = a.original_name.rsplit('.', 1)[-1]|lower %}
+        <li>
+          <span class="file-icon {{ 'pdf' if ext == 'pdf' else 'doc' }}">{{ ext|upper }}</span>
+          <div>
+            <a href="{{ url_for('download_file', stored_name=a.stored_name) }}">{{ a.original_name }}</a>
+            <div class="muted small">
+              {{ 'Resume' if a.kind == 'resume' else 'เอกสารประกอบ' }} ·
+              {{ human_size(a.size_bytes) }} · อัปโหลด {{ a.created_at|datetime_th }}
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">ไม่มีไฟล์แนบ</p>
+    {% endif %}
+
+    <h2>ผลการพิจารณา</h2>
+    {% if booking.status == 'pending' %}
+      <p class="muted">รอเจ้าหน้าที่ตรวจสอบและอนุมัติ</p>
+    {% else %}
+      <table class="kv">
+        <tr><th>ผล</th><td><span class="badge {{ STATUS_COLORS[booking.status] }}">{{ STATUS_LABELS[booking.status] }}</span></td></tr>
+        <tr><th>ผู้พิจารณา</th><td>{{ (booking.reviewer_first or '') ~ ' ' ~ (booking.reviewer_last or '') if booking.reviewer_first else '-' }}</td></tr>
+        <tr><th>เวลาพิจารณา</th><td>{{ booking.reviewed_at|datetime_th }}</td></tr>
+        <tr><th>หมายเหตุ</th><td>{{ booking.admin_note or '-' }}</td></tr>
+      </table>
+    {% endif %}
+
+    {% if booking.status in ('pending', 'approved') %}
+      <form method="post" action="{{ url_for('cancel_booking', booking_id=booking.id) }}"
+            onsubmit="return confirm('ยืนยันการยกเลิกคำขอ {{ booking.booking_code }} ?');">
+        <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+        <button class="btn danger" type="submit">ยกเลิกคำขอนี้</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<p><a class="btn" href="{{ url_for('my_bookings') }}">← กลับไปคำขอของฉัน</a></p>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}คำขอของฉัน{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>คำขอของฉัน</h1>
+  <a class="btn primary" href="{{ url_for('create_booking') }}">+ ยื่นคำขอ</a>
+</div>
+
+<div class="tabs">
+  <a class="tab {{ 'active' if not status }}" href="{{ url_for('my_bookings') }}">ทั้งหมด</a>
+  {% for key, label in STATUS_LABELS.items() %}
+    <a class="tab {{ 'active' if status == key }}" href="{{ url_for('my_bookings', status=key) }}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if bookings %}
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>เลขที่คำขอ</th><th>ประเภท</th><th>สถานที่ฝึกงาน</th><th>วันที่ยื่น</th>
+        <th>ไฟล์แนบ</th><th>สถานะ</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in bookings %}
+      <tr>
+        <td><a href="{{ url_for('booking_detail', booking_id=b.id) }}">{{ b.booking_code }}</a></td>
+        <td><span class="badge gray">{{ b.type_name }}</span></td>
+        <td>{{ b.venue_name }}</td>
+        <td>{{ b.created_at|datetime_th }}</td>
+        <td>{{ attachment_counts.get(b.id, 0) }} ไฟล์</td>
+        <td><span class="badge {{ STATUS_COLORS[b.status] }}">{{ STATUS_LABELS[b.status] }}</span></td>
+        <td><a class="btn small" href="{{ url_for('booking_detail', booking_id=b.id) }}">ดูรายละเอียด</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card"><p class="empty">ยังไม่มีรายการในหมวดนี้</p></div>
+{% endif %}
+{% endblock %}
